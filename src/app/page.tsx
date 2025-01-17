@@ -1,12 +1,13 @@
 "use client"
 import React from 'react';
-import Signup from './signup';
+import Signup from '../auth/signup';
 
 export default function Home() {
   return (
     <div>
-      <p></p>
-   <Signup />
+      
+      <Signup />
+   
     </div>
   );
 }
