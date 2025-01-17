@@ -115,7 +115,7 @@ import axios from 'axios';
 
 // Create an axios instance with a base URL
 const axiosInstance = axios.create({
-  baseURL: 'https://your-api-base-url.com', // Replace with your actual base URL
+  baseURL: 'http://localhost:5000/api', // Replace with your actual base URL
 });
 
 export default function Signup() {
@@ -190,8 +190,10 @@ export default function Signup() {
     if (validateForm()) {
       try {
         // If you're using the axiosInstance, you don't need to prepend baseURL.
-        const response = await axiosInstance.post('/signup', formData);
+
+        const response = await axiosInstance.post('auth/dto/signup', formData);
         console.log('User signed up successfully:', response.data);
+
         // Redirect user to login page or dashboard on success
       } catch (error) {
         const errorMessage = (error as any).response?.data?.message || (error as any).message;
