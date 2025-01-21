@@ -11,7 +11,7 @@ interface FormData {
   password: string;
 }
 
-const Signup = () => {
+const Signin = () => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
@@ -39,13 +39,8 @@ const Signup = () => {
 
     // Validate form before submitting (simple validation example
   const validateForm = () : boolean => {
-    const formErrors: { username: string; email: string; password: string } = { username: '', email: '', password: '' };
+    const formErrors: { email: string; password: string } = { email: '', password: '' };
     let isValid = true;
-
-    if (!formData.username) {
-      formErrors.username = 'Username is required';
-      isValid = false;
-    }
 
     if (!formData.email) {
       formErrors.email = 'Email is required';
@@ -57,7 +52,6 @@ const Signup = () => {
       isValid = false;
     }
 
-    setErrors(formErrors);
     return isValid;
   }
 
@@ -72,12 +66,12 @@ const Signup = () => {
       setError(null); // Reset error message
 
       try {
-        const response = await axiosInstance.post('auth/signup', formData);
+        const response = await axiosInstance.post('auth/signin', formData);
         console.log('User signed up successfully:', response.data);
 
         // Optionally, redirect or notify the user
         // Example: window.location.href = '/dashboard';
-        window.location.href = './signin';
+        window.location.href = '/';
 
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -99,19 +93,6 @@ const Signup = () => {
         <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Sign Up</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
-          </div>
-
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
             <input
@@ -144,17 +125,17 @@ const Signup = () => {
             type="submit" disabled={isLoading}
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
           >
-              {isLoading ? 'Signing up...' : 'Sign Up'}
-
+              {isLoading ? 'Loaging up...' : 'LOGIN'}
+            {/* Sign Up */}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account? <a href="./signin" className="text-indigo-600 hover:text-indigo-700">Login</a>
+          I don't have an account? <a href="/auth/signup" className="text-indigo-600 hover:text-indigo-700">Signup</a>
         </p>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Signin;
