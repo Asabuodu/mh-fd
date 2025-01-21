@@ -1,13 +1,14 @@
+
 "use client"
+import Link from 'next/link';
 import React from 'react';
-import Signup from '../auth/signup';
 
 export default function Home() {
   return (
     <div>
-      
-      <Signup />
-   
+      <h1>Hello</h1>
+
+      <Link href="/auth/signup">I don't have an account</Link>
     </div>
   );
 }
