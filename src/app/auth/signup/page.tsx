@@ -2,14 +2,9 @@
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import axiosInstance from '../../../../lib/axios';
-// import "..globals.css';"; 
 
 
-// Create an axios instance with a base URL
-// const axiosInstance = axios.create({
-//   baseURL: 'http://localhost:5000/api', // Replace with your actual base URL
-// });
-
+// Define form data interface
 interface FormData {
   username: string;
   email: string;
