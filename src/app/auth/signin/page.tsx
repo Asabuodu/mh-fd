@@ -131,8 +131,12 @@ const Signin = () => {
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          I don't have an account? <a href="/auth/signup" className="text-indigo-600 hover:text-indigo-700">Signup</a>
+          I do not have an account? <a href="/auth/signup" className="text-indigo-600 hover:text-indigo-700">Signup</a>
         </p>
+
+      <p className='mt-4 text-center '>
+          <a href="/auth/resetpassword" className='text-indigo-600 hover:text-indigo-900 text-lg' >Forgotten Password</a>
+      </p>
       </div>
     </div>
   );
