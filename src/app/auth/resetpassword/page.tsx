@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react';
 import axiosInstance from '../../../../lib/axios';
+import axios from 'axios';
 
 interface FormData {
   email: string;
@@ -54,7 +55,7 @@ const ResetPassword = () => {
         setSuccessMessage('A password reset link has been sent to your email.');
       } catch (error) {
         setSuccessMessage(null);
-        if (error.response?.data?.message) {
+        if (axios.isAxiosError(error) && error.response?.data?.message) {
           setError(error.response.data.message);
         } else {
           setError('Unexpected error occurred while trying to reset password.');

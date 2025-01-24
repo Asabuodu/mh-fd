@@ -1,14 +1,13 @@
-"use client"
+"use client";
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
 import axiosInstance from '../../../../lib/axios';
+import { isAxiosError } from 'axios';
 
-
-// Define form data interface
 interface FormData {
   username: string;
   email: string;
   password: string;
+  confirm_password: string;
 }
 
 const Signup = () => {
@@ -16,30 +15,31 @@ const Signup = () => {
     username: '',
     email: '',
     password: '',
+    confirm_password: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [errors, setErrors] = useState({
     username: '',
     email: '',
     password: '',
+    confirm_password: '',
   });
 
-  // Handle form data changes
+  const [showSuccessToast, setShowSuccessToast] = useState(false); // To control the visibility of the success message
+  const [showErrorToast, setShowErrorToast] = useState<string | null>(null); // To show error messages as a toast
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
-      // ...formData,
-        ...prev,
+      ...prev,
       [name]: value,
     }));
-  }
+  };
 
-    // Validate form before submitting (simple validation example
-  const validateForm = () : boolean => {
-    const formErrors: { username: string; email: string; password: string } = { username: '', email: '', password: '' };
+  const validateForm = (): boolean => {
+    const formErrors: { username: string; email: string; password: string; confirm_password: string } = { username: '', email: '', password: '', confirm_password: '' };
     let isValid = true;
 
     if (!formData.username) {
@@ -57,38 +57,60 @@ const Signup = () => {
       isValid = false;
     }
 
+    if (!formData.confirm_password) {
+      formErrors.confirm_password = 'Confirm password is required';
+      isValid = false;
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      formErrors.confirm_password = 'Passwords do not match';
+      isValid = false;
+    }
     setErrors(formErrors);
     return isValid;
-  }
-
-   // Handle form submission
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-        // Validate the form before submitting
+    setError(null);
+    setShowSuccessToast(false); // Reset success toast visibility before new submission
+    setShowErrorToast(null); // Reset error toast visibility before new submission
+
     if (validateForm()) {
       setIsLoading(true);
-      setError(null); // Reset error message
 
       try {
         const response = await axiosInstance.post('auth/signup', formData);
         console.log('User signed up successfully:', response.data);
 
-        // Optionally, redirect or notify the user
-        // Example: window.location.href = '/dashboard';
-        window.location.href = './signin';
+        // Show success toast
+        setShowSuccessToast(true);
 
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const errorMessage = error.response?.data?.message || error.message;
-          console.error('Error during signup:', errorMessage); //set error message to display
+        // Redirect after a brief delay
+        setTimeout(() => {
+          window.location.href = './signin'; // Redirect to signin page
+        }, 2000); // 2 seconds delay
+
+      } catch (err) {
+        if (isAxiosError(err)) {
+          const errorMessage = (err.response?.data as { message?: string })?.message || err.message;
+
+          if (errorMessage.includes('User with this email already exists')) {
+            setError('This email is already registered. Please use a different one.');
+          } else {
+            setError('An unexpected error occurred. Please try again later.');
+          }
+
+          // Show error toast
+          setShowErrorToast(errorMessage);
+          console.error('Error during signup:', err);
         } else {
-          setError('Unexpected error during signup');
-          console.error('Unexpected error during signup:', error);
+          setError('An unexpected error occurred. Please try again later.');
+          setShowErrorToast('An unexpected error occurred. Please try again later.');
+          console.error('Unexpected error during signup:', err);
         }
       } finally {
-        setIsLoading(false);  // Reset loading state after request
+        setIsLoading(false);
       }
     }
   };
@@ -138,14 +160,26 @@ const Signup = () => {
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
 
-          {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Display error message */}
+          <div className="mb-6">
+            <label htmlFor="confirm_password" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
+              value={formData.confirm_password}
+              onChange={handleChange}
+              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {errors.confirm_password && <p className="text-red-500 text-sm mt-1">{errors.confirm_password}</p>}
+          </div>
+
+          {error && <p style={{ color: 'red' }}>{error}</p>}
 
           <button
             type="submit" disabled={isLoading}
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
           >
-              {isLoading ? 'Signing up...' : 'Sign Up'}
-
+            {isLoading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
 
@@ -153,6 +187,20 @@ const Signup = () => {
           Already have an account? <a href="./signin" className="text-indigo-600 hover:text-indigo-700">Login</a>
         </p>
       </div>
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-4 rounded-md shadow-lg">
+          <p>Signup Successful! Redirecting to login page...</p>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white p-4 rounded-md shadow-lg">
+          <p>{showErrorToast}</p>
+        </div>
+      )}
     </div>
   );
 };

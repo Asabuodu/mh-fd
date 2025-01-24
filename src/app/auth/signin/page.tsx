@@ -1,8 +1,7 @@
-"use client"
+"use client";
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import axiosInstance from '../../../../lib/axios';
-
 
 // Define form data interface
 interface FormData {
@@ -20,25 +19,26 @@ const Signin = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [errors, setErrors] = useState({
+  const [errors] = useState({
     username: '',
     email: '',
     password: '',
   });
 
+  const [showSuccessToast, setShowSuccessToast] = useState(false); // To control success toast visibility
+  const [showErrorToast, setShowErrorToast] = useState<string | null>(null); // To show error toast
+
   // Handle form data changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
-      // ...formData,
-        ...prev,
+      ...prev,
       [name]: value,
     }));
-  }
+  };
 
-    // Validate form before submitting (simple validation example
-  const validateForm = () : boolean => {
+  // Validate form before submitting (simple validation example)
+  const validateForm = (): boolean => {
     const formErrors: { email: string; password: string } = { email: '', password: '' };
     let isValid = true;
 
@@ -53,36 +53,44 @@ const Signin = () => {
     }
 
     return isValid;
-  }
+  };
 
-   // Handle form submission
-
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-        // Validate the form before submitting
+
     if (validateForm()) {
       setIsLoading(true);
       setError(null); // Reset error message
+      setShowSuccessToast(false); // Reset success toast visibility before new submission
+      setShowErrorToast(null); // Reset error toast visibility before new submission
 
       try {
         const response = await axiosInstance.post('auth/signin', formData);
-        console.log('User signed up successfully:', response.data);
+        console.log('User logged in successfully:', response.data);
 
-        // Optionally, redirect or notify the user
-        // Example: window.location.href = '/dashboard';
-        window.location.href = '/';
+        // Show success toast
+        setShowSuccessToast(true);
 
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const errorMessage = error.response?.data?.message || error.message;
-          console.error('Error during signup:', errorMessage); //set error message to display
+        // Redirect to home after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/'; // Redirect to home page
+        }, 2000); // 2 seconds delay
+
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          const errorMessage = err.response?.data?.message || err.message;
+          console.error('Error during login:', errorMessage);
+          
+          // Show error toast
+          setShowErrorToast(errorMessage);
         } else {
-          setError('Unexpected error during signup');
-          console.error('Unexpected error during signup:', error);
+          setError('Unexpected error during login');
+          setShowErrorToast('Unexpected error during login');
+          console.error('Unexpected error during login:', err);
         }
       } finally {
-        setIsLoading(false);  // Reset loading state after request
+        setIsLoading(false); // Reset loading state after request
       }
     }
   };
@@ -90,7 +98,7 @@ const Signin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
-        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Sign Up</h1>
+        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">Sign In</h1>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -119,14 +127,13 @@ const Signin = () => {
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
 
-          {error && <p style={{ color: 'red' }}>{error}</p>}  {/* Display error message */}
+          {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
 
           <button
             type="submit" disabled={isLoading}
             className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
           >
-              {isLoading ? 'Loaging up...' : 'LOGIN'}
-            {/* Sign Up */}
+            {isLoading ? 'Loading...' : 'LOGIN'}
           </button>
         </form>
 
@@ -134,10 +141,24 @@ const Signin = () => {
           I do not have an account? <a href="/auth/signup" className="text-indigo-600 hover:text-indigo-700">Signup</a>
         </p>
 
-      <p className='mt-4 text-center '>
-          <a href="/auth/resetpassword" className='text-indigo-600 hover:text-indigo-900 text-lg' >Forgotten Password</a>
-      </p>
+        <p className="mt-4 text-center">
+          <a href="/auth/resetpassword" className="text-indigo-600 hover:text-indigo-900 text-lg">Forgotten Password</a>
+        </p>
       </div>
+
+      {/* Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white p-4 rounded-md shadow-lg">
+          <p>Login Successful! Redirecting...</p>
+        </div>
+      )}
+
+      {/* Error Toast */}
+      {showErrorToast && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white p-4 rounded-md shadow-lg">
+          <p>{showErrorToast}</p>
+        </div>
+      )}
     </div>
   );
 };
