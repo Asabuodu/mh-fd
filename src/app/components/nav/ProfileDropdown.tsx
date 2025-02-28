@@ -1,3 +1,4 @@
+
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useSession, signOut } from 'next-auth/react';
@@ -6,6 +7,7 @@ import { useState } from 'react';
 export default function ProfileDropdown() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 
   if (!session) return null; // Hide if not authenticated
 
