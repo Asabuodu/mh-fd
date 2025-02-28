@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import axiosInstance from '../../../../lib/axios';
+import axiosInstance from '../../../../../lib/axios';
 import { isAxiosError } from 'axios';
 
 interface FormData {
