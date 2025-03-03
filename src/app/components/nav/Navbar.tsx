@@ -41,7 +41,7 @@ export default function Navbar() {
                 onClick={() => router.push("../api/auth/signup")}
                 className="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700"
               >
-                Create Account
+                Sign Up
               </button>
             </div>
           ) : (
