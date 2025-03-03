@@ -1,10 +1,11 @@
 
-
 "use client";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+ 
 import axiosInstance from '../../../../../lib/axios'; // Ensure this is correctly imported
+
 
 // Define form data interface
 interface FormData {
@@ -77,6 +78,7 @@ const Signin = () => {
       setShowErrorToast(error.message);
     } finally {
       setIsLoading(false);
+
     }
   };
 
@@ -133,6 +135,7 @@ const Signin = () => {
         <p className="mt-4 text-center text-sm text-gray-600">
           I do not have an account?{" "}
           <a href="/api/auth/signup" className="text-indigo-600 hover:text-indigo-700">
+
             Signup
           </a>
         </p>

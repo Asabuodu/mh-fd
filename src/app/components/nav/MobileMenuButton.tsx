@@ -1,6 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
+
 export default function MobileMenuButton() {
   return (
     <Disclosure as="div" className="absolute inset-y-0 left-0 flex items-center sm:hidden">
