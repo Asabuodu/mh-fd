@@ -3,10 +3,19 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useSession, signOut } from 'next-auth/react';
 import { useState } from 'react';
+import { useRouter } from "next/navigation";
+
+        
+function handleLogout(router: any) {
+  signOut({ callbackUrl: "/" }) // Redirect to home or login page after logout
+    .then(() => router.push("/"))
+    .catch((error) => console.error("Logout failed", error));
+}
 
 export default function ProfileDropdown() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const router = useRouter();
 
 
   if (!session) return null; // Hide if not authenticated
@@ -51,19 +60,20 @@ export default function ProfileDropdown() {
             </a>
           </MenuItem>
           <MenuItem>
-            <button
-              type="button"
-              onClick={() => {
-                setIsMenuOpen(false); // Hide dropdown immediately
-                signOut({ callbackUrl: "../api/auth/signout" }); // Logout user
-              }}
+          <button
+              onClick={() => handleLogout(router)}
+
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Sign out
             </button>
+
           </MenuItem>
         </MenuItems>
       </Menu>
     </div>
   );
 }
+
+
+

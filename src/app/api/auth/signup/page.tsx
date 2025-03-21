@@ -81,6 +81,7 @@ const Signup = () => {
 
       try {
         const response = await axiosInstance.post('auth/signup', formData);
+
         console.log('User signed up successfully:', response.data);
 
         // Show success toast

@@ -1,7 +1,11 @@
+
 "use client";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+ 
+import axiosInstance from '../../../../../lib/axios'; // Ensure this is correctly imported
+
 
 // Define form data interface
 interface FormData {
@@ -47,20 +51,34 @@ const Signin = () => {
     setShowSuccessToast(false);
     setShowErrorToast(null);
 
-    const result = await signIn("credentials", {
-      email: formData.email,
-      password: formData.password,
-      redirect: false, // Prevent automatic redirection
-    });
+    try {
+      // **Check if user exists in the database**
+      const { data } = await axiosInstance.post("/auth/signin", formData);
 
-    setIsLoading(false);
+      if (!data?.user) {
+        throw new Error("Invalid credentials. User not found.");
+      }
 
-    if (result?.error) {
-      setError("Invalid credentials. Please try again.");
-      setShowErrorToast("Invalid credentials. Please try again.");
-    } else {
+      // **If user exists, proceed with signIn**
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false, // Prevent automatic redirection
+      });
+
+      if (result?.error) {
+        throw new Error("Invalid credentials. Please try again.");
+      }
+
       setShowSuccessToast(true);
       setTimeout(() => router.push("/"), 2000); // Redirect after success
+
+    } catch (error: any) {
+      setError(error.message);
+      setShowErrorToast(error.message);
+    } finally {
+      setIsLoading(false);
+
     }
   };
 
@@ -116,7 +134,8 @@ const Signin = () => {
         {/* Signup & Forgot Password Links */}
         <p className="mt-4 text-center text-sm text-gray-600">
           I do not have an account?{" "}
-          <a href="/auth/signup" className="text-indigo-600 hover:text-indigo-700">
+          <a href="/api/auth/signup" className="text-indigo-600 hover:text-indigo-700">
+
             Signup
           </a>
         </p>
